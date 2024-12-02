@@ -1,0 +1,122 @@
+{
+  "_comment": "DO NOT EDIT: FILE GENERATED AUTOMATICALLY BY PTERODACTYL PANEL - PTERODACTYL.IO",
+  "meta": {
+    "version": "PTDL_v2",
+    "update_url": null
+  },
+  "exported_at": "2024-12-01T23:05:35-07:00",
+  "name": "Source Engine Game",
+  "author": "ethan@yasfu.net",
+  "description": "Any SRCDS game, i.e. Garry's Mod, Team Fortress 2, Counter-Strike: (Source, Global Offensive).\r\nPteroFuse helps you manage your game servers better by creating de-duplicated 'layers' that are fused together",
+  "features": null,
+  "docker_images": {
+    "ghcr.io\/littlebigbug\/pterofuse-source:latest": "ghcr.io\/littlebigbug\/pterofuse-source:latest"
+  },
+  "file_denylist": [],
+  "startup": ".\/srcds_run -game {{SRCDS_GAME}} -console -port {{SERVER_PORT}} +map {{SRCDS_MAP}} +ip 0.0.0.0 -strictportbind -norestart",
+  "config": {
+    "files": "{}",
+    "startup": "{\r\n    \"done\": \"gameserver Steam ID\"\r\n}",
+    "logs": "{}",
+    "stop": "quit"
+  },
+  "scripts": {
+    "installation": {
+      "script": "#!\/bin\/bash\r\n# steamcmd Base Installation Script\r\n#\r\n# Server Files: \/mnt\/server\r\n\r\n##\r\n#\r\n# Variables\r\n# STEAM_USER, STEAM_PASS, STEAM_AUTH - Steam user setup. If a user has 2fa enabled it will most likely fail due to timeout. Leave blank for anon install.\r\n# WINDOWS_INSTALL - if it's a windows server you want to install set to 1\r\n# SRCDS_APPID - steam app id found here - https:\/\/developer.valvesoftware.com\/wiki\/Dedicated_Servers_List\r\n# SRCDS_BETAID - beta id\r\n# SRCDS_BETAPASS - beta password\r\n# EXTRA_FLAGS - when a server has extra flags for things like beta installs or updates.\r\n#\r\n##\r\n\r\nLAYERS_DIR=\"\/mnt\/server-layers\"\r\n\r\nSTEAMCMD_DIR=\"${LAYERS_DIR}\/_server-bases\/steamcmd\"\r\nBASE_SERVER_DIR=\"${LAYERS_DIR}\/_server-bases\/source-${SRCDS_APPID}\"\r\n\r\nif [ -n \"${SRCDS_BETAID}\" ]; then\r\n  BASE_SERVER_DIR+=\"-beta${SRCDS_BETAID}\"\r\nfi\r\n\r\nmkdir -p \"${STEAMCMD_DIR}\"\r\nmkdir -p \"${BASE_SERVER_DIR}\"\r\n\r\n## just in case someone removed the defaults.\r\nif [ \"${STEAM_USER}\" == \"\" ]; then\r\n    echo -e \"steam user is not set.\\n\"\r\n    echo -e \"Using anonymous user.\\n\"\r\n    STEAM_USER=anonymous\r\n    STEAM_PASS=\"\"\r\n    STEAM_AUTH=\"\"\r\nelse\r\n    echo -e \"user set to ${STEAM_USER}\"\r\nfi\r\n\r\n# download & install SteamCMD if absent\r\nif [ -z \"$( ls -A ${STEAMCMD_DIR} )\" ]; then\r\n   curl -sSL -o \/tmp\/steamcmd.tar.gz https:\/\/steamcdn-a.akamaihd.net\/client\/installer\/steamcmd_linux.tar.gz\r\n   tar -xzvf \/tmp\/steamcmd.tar.gz -C \"${STEAMCMD_DIR}\"\r\nfi\r\n\r\n# fix SteamCMD disk write error when this folder is missing\r\nmkdir -p \"${BASE_SERVER_DIR}\/steamapps\"\r\n\r\n# SteamCMD fails otherwise for some reason, even running as root.\r\n# This is changed at the end of the install process anyways.\r\nchown -R root:root \/mnt\r\nexport HOME=\"${BASE_SERVER_DIR}\"\r\n\r\n# install or validate\/update game server base\r\ncd \"${STEAMCMD_DIR}\" || exit 1\r\n\r\n# shellcheck disable=SC2046\r\n# shellcheck disable=SC2086\r\n.\/steamcmd.sh +force_install_dir \/mnt\/server +login \"${STEAM_USER}\" \"${STEAM_PASS}\" \"${STEAM_AUTH}\" \\\r\n  $( [[ \"${WINDOWS_INSTALL}\" == \"1\" ]] && printf %s '+@sSteamCmdForcePlatformType windows' ) \\\r\n  +app_update \"${SRCDS_APPID}\" ${EXTRA_FLAGS} \\\r\n  $( [[ -z ${SRCDS_BETAID} ]] || printf %s \"-beta ${SRCDS_BETAID}\" ) \\\r\n  $( [[ -z ${SRCDS_BETAPASS} ]] || printf %s \"-betapassword ${SRCDS_BETAPASS}\" ) \\\r\n  validate +quit\r\n\r\n# copy over steam libraries\r\nSDK32_DIR=\"${BASE_SERVER_DIR}\/.steam\/sdk32\"\r\nSDK64_DIR=\"${BASE_SERVER_DIR}\/.steam\/sdk64\"\r\n\r\nmkdir -p \"${SDK32_DIR}\"\r\nmkdir -p \"${SDK64_DIR}\"\r\ncp -v linux32\/steamclient.so \"${SDK32_DIR}\/steamclient.so\"\r\ncp -v linux64\/steamclient.so \"${SDK64_DIR}\/steamclient.so\"\r\n\r\n# other layers are populated during server startups",
+      "container": "ghcr.io\/pterodactyl\/installers:debian",
+      "entrypoint": "bash"
+    }
+  },
+  "variables": [
+    {
+      "name": "Game ID",
+      "description": "The ID corresponding to the game to download and run using SRCDS.",
+      "env_variable": "SRCDS_APPID",
+      "default_value": "",
+      "user_viewable": true,
+      "user_editable": false,
+      "rules": "required|numeric|digits_between:1,6",
+      "field_type": "text"
+    },
+    {
+      "name": "Game Name",
+      "description": "The name corresponding to the game to download and run using SRCDS. (ie. \"cstrike\")",
+      "env_variable": "SRCDS_GAME",
+      "default_value": "",
+      "user_viewable": true,
+      "user_editable": false,
+      "rules": "required|string|max:20",
+      "field_type": "text"
+    },
+    {
+      "name": "Startup Map",
+      "description": "Default map for the server",
+      "env_variable": "SRCDS_MAP",
+      "default_value": "de_dust2",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "required|string|alpha_dash",
+      "field_type": "text"
+    },
+    {
+      "name": "Steam Username",
+      "description": "",
+      "env_variable": "STEAM_USER",
+      "default_value": "",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "nullable|string",
+      "field_type": "text"
+    },
+    {
+      "name": "Steam Password",
+      "description": "",
+      "env_variable": "STEAM_PASS",
+      "default_value": "",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "nullable|string",
+      "field_type": "text"
+    },
+    {
+      "name": "Steam Auth",
+      "description": "",
+      "env_variable": "STEAM_AUTH",
+      "default_value": "",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "required|string|max:20",
+      "field_type": "text"
+    },
+    {
+      "name": "Layers",
+      "description": "",
+      "env_variable": "LAYERS_CONFIG",
+      "default_value": "",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "required|string",
+      "field_type": "text"
+    },
+    {
+      "name": "Beta ID",
+      "description": "Beta ID to opt into",
+      "env_variable": "SRCDS_BETAID",
+      "default_value": "",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "nullable|string|max:64",
+      "field_type": "text"
+    },
+    {
+      "name": "Beta Password",
+      "description": "Beta password (if beta is password protected)",
+      "env_variable": "SCRDS_BETAPASS",
+      "default_value": "",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "required|string|max:20",
+      "field_type": "text"
+    }
+  ]
+}
