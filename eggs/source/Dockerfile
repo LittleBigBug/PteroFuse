@@ -21,4 +21,6 @@ WORKDIR /home/container
 COPY eggs/source/entrypoint.sh /entrypoint.sh
 COPY eggs/pterofuse-start.sh /pterofuse-start.sh
 
+RUN chmod +x /pterofuse-start.sh
+
 CMD [ "/bin/bash", "/entrypoint.sh" ]

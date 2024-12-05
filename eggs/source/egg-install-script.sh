@@ -49,11 +49,13 @@ mkdir -p "${BASE_SERVER_DIR}/steamapps"
 
 # SteamCMD fails otherwise for some reason, even running as root.
 # This is changed at the end of the install process anyways.
-chown -R root:root /mnt
+# chown -R root:root "${BASE_SERVER_DIR}"
 export HOME="${BASE_SERVER_DIR}"
 
 # install or validate/update game server base
 cd "${STEAMCMD_DIR}" || exit 1
+
+chmod +x steamcmd.sh
 
 # shellcheck disable=SC2046
 # shellcheck disable=SC2086
