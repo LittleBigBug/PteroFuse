@@ -64,7 +64,7 @@ if [ -n "${LAYERS_CONFIG}" ]; then
           # shellcheck disable=SC2046
           git clone --single-branch --depth 1 \
             $( [[ -z ${GIT_BRANCH} ]] || printf %s "--branch ${GIT_BRANCH}" ) \
-            "${GIT_URL}" "${LAYER_DIR}"
+            "${GIT_URL}" "${LAYER_DIR}" || (echo "Failed to clone git repo!" && exit 1)
 
           if [ -n "${GIT_COMMIT}" ]; then
             # If specified, fetch & checkout the specific commit hash provided
@@ -101,5 +101,5 @@ if [ -z "${ONLY_UPDATE}" ]; then
   UNIONFS_UNION="${SERVER_INST_LAYER}=RW:${GENERATED_UNIONFS}${BASE_SERVER_DIR}=RO"
 
   # Fuse!
-  unionfs-fuse -o cow "${UNIONFS_UNION}" /home/container
+  unionfs-fuse -o cow "${UNIONFS_UNION}" /home/container || (echo "Failed to fuse!" && exit 1)
 fi
