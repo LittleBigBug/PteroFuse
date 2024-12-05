@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #
-# Copyright (c) 2021 Matthew Penner
+# Copyright (c) 2021 Matthew Penner & Ethan Jones
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -66,7 +66,8 @@ BASE_SERVER_DIR="${LAYERS_DIR}/_server-bases/${BASE_NAME}"
 if [ -z "${AUTO_UPDATE}" ] || [ "${AUTO_UPDATE}" == "1" ]; then
     # Update Source Server
     # shellcheck disable=SC2046
-    ./steamcmd/steamcmd.sh +force_install_dir "${BASE_SERVER_DIR}" +login "${STEAM_USER}" "${STEAM_PASS}" "${STEAM_AUTH}" \
+    /mnt/server-layers/_server-bases/steamcmd/steamcmd.sh \
+      +force_install_dir "${BASE_SERVER_DIR}" +login "${STEAM_USER}" "${STEAM_PASS}" "${STEAM_AUTH}" \
       +app_update "${SRCDS_APPID}" \
       $( [[ -z ${SRCDS_BETAID} ]] || printf %s "-beta ${SRCDS_BETAID}" ) \
       $( [[ -z ${SRCDS_BETAPASS} ]] || printf %s "-betapassword ${SRCDS_BETAPASS}" ) \
@@ -78,7 +79,7 @@ fi
 
 # start pterofuse
 # updates layers and mounts a unionfs system
-./pterofuse-start.sh || (echo "Failed to start PteroFuse" && exit 1)
+/pterofuse-start.sh || (echo "Failed to start PteroFuse" && exit 1)
 
 # Display the command we're running in the output, and then execute it with the env
 # from the container itself.

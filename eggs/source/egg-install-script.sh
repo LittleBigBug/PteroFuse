@@ -57,7 +57,7 @@ cd "${STEAMCMD_DIR}" || exit 1
 
 # shellcheck disable=SC2046
 # shellcheck disable=SC2086
-./steamcmd.sh +force_install_dir /mnt/server +login "${STEAM_USER}" "${STEAM_PASS}" "${STEAM_AUTH}" \
+./steamcmd.sh +force_install_dir "${BASE_SERVER_DIR}" +login "${STEAM_USER}" "${STEAM_PASS}" "${STEAM_AUTH}" \
   $( [[ "${WINDOWS_INSTALL}" == "1" ]] && printf %s '+@sSteamCmdForcePlatformType windows' ) \
   +app_update "${SRCDS_APPID}" ${EXTRA_FLAGS} \
   $( [[ -z ${SRCDS_BETAID} ]] || printf %s "-beta ${SRCDS_BETAID}" ) \

@@ -7,7 +7,7 @@ SERVER_INST_LAYER="${LAYERS_DIR}/_server-instances/${SERVER_ID}"
 mkdir -p "${SERVER_INST_LAYER}" || echo "Failed to create the server instance directory! Aborting..." && exit 1
 
 ## EXAMPLE DATA
-## LAYERS_CONFIG="git:https://github.com/mump-surf/surf-base#branch; git:https://github.com/mump-surf/skill-surf-base#/commit; git:https://github.com/mump-surf/surf-t1-maps"
+## LAYERS_CONFIG="git:https://user:pass@github.com/mump-surf/surf-base#branch; git:https://github.com/mump-surf/skill-surf-base#/commit; git:https://github.com/mump-surf/surf-t1-maps"
 ## EXAMPLE DATA
 
 GENERATED_UNIONFS=""
