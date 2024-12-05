@@ -17,7 +17,7 @@ USER container
 ENV USER=container HOME=/home/container
 WORKDIR /home/container
 
-COPY entrypoint.sh /entrypoint.sh
-COPY ../pterofuse-start.sh /pterofuse-start.sh
+COPY eggs/source/entrypoint.sh /entrypoint.sh
+COPY eggs/pterofuse-start.sh /pterofuse-start.sh
 
 CMD [ "/bin/bash", "/entrypoint.sh" ]
