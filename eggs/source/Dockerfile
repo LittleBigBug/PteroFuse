@@ -23,6 +23,7 @@ COPY eggs/pterofuse-start.sh /pterofuse-start.sh
 
 USER root
 RUN chmod +x /pterofuse-start.sh
+RUN chown container:container -R /mnt
 USER container
 
 CMD [ "/bin/bash", "/entrypoint.sh" ]

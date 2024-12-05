@@ -49,7 +49,7 @@ mkdir -p "${BASE_SERVER_DIR}/steamapps"
 
 # SteamCMD fails otherwise for some reason, even running as root.
 # This is changed at the end of the install process anyways.
-# chown -R root:root "${BASE_SERVER_DIR}"
+chown -R root:root /mnt
 export HOME="${BASE_SERVER_DIR}"
 
 # install or validate/update game server base
@@ -74,5 +74,7 @@ mkdir -p "${SDK32_DIR}"
 mkdir -p "${SDK64_DIR}"
 cp -v linux32/steamclient.so "${SDK32_DIR}/steamclient.so"
 cp -v linux64/steamclient.so "${SDK64_DIR}/steamclient.so"
+
+chown -R container:container /mnt
 
 # other layers are populated during server startups
